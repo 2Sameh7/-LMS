@@ -1,0 +1,33 @@
+@media (max-width: 992px) {
+    #sidebar-wrapper {
+        transform: translateX(100%);
+    }
+    #sidebar-wrapper.show {
+        transform: translateX(0);
+    }
+    #page-content-wrapper {
+        margin-right: 0 !important;
+    }
+    .stat-value { font-size: 1.5rem; }
+}
+
+@media (max-width: 768px) {
+    .container-fluid.py-3 { padding: 1rem !important; }
+    .stat-card { padding: 1rem; }
+    .stat-icon { width: 42px; height: 42px; font-size: 1rem; }
+    .stat-value { font-size: 1.35rem; }
+    .stat-label { font-size: 0.7rem; }
+    .btn-lg { padding: 0.6rem 1.5rem; font-size: 0.9rem; }
+}
+
+@media (max-width: 576px) {
+    .container-fluid.py-3 { padding: 0.75rem !important; }
+    .card-body { padding: 1rem; }
+    .table { font-size: 0.85rem; }
+    .table thead th { font-size: 0.7rem; padding: 0.75rem; }
+    .table tbody td { padding: 0.75rem; }
+}
+
+@media (min-width: 1400px) {
+    .container-fluid { max-width: 1320px; }
+}
