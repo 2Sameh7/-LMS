@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>اختبارات الكورس: {{ course.title }}</h2>
+        <a href="{% url 'teacher_courses' %}" class="btn btn-sm btn-outline-secondary">← العودة للكورسات</a>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuizModal">
+        <i class="fas fa-plus"></i> اختبار جديد
+    </button>
+</div>
+
+<div class="row">
+    {% for quiz in quizzes %}
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5>{{ quiz.title }}</h5>
+                    <span class="badge 
+                        {% if quiz.status == 'active' %}bg-success
+                        {% elif quiz.status == 'draft' %}bg-secondary
+                        {% else %}bg-danger{% endif %}">
+                        {{ quiz.get_status_display }}
+                    </span>
+                </div>
+                <p class="text-muted small">{{ quiz.questions.count }} أسئلة</p>
+                <div class="btn-group">
+                    <a href="{% url 'manage_questions' quiz.id %}" class="btn btn-sm btn-outline-info">الأسئلة</a>
+                    <a href="{% url 'view_results' quiz.id %}" class="btn btn-sm btn-outline-success">النتائج</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-muted py-4">لا توجد اختبارات مضافة لهذا الكورس بعد</p>
+    {% endfor %}
+</div>
+
+<!-- Modal Add Quiz -->
+<div class="modal fade" id="addQuizModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة اختبار جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">عنوان الاختبار</label>
+                        <input type="text" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">الحالة</label>
+                        <select name="status" class="form-select">
+                            <option value="draft">مسودة</option>
+                            <option value="active">نشط</option>
+                            <option value="closed">مغلق</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

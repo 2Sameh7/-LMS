@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1"><i class="fas fa-book-open" style="color:var(--primary-500);"></i> إدارة الكورسات</h2>
+        <p class="text-muted mb-0">بحث وتصفية كورساتك</p>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseModal">
+        <i class="fas fa-plus"></i> كورس جديد
+    </button>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.85rem;">بحث</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="اسم الكورس أو الوصف..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الحالة</label>
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    <option value="published" {% if selected_status == 'published' %}selected{% endif %}>منشور</option>
+                    <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>مسودة</option>
+                    <option value="archived" {% if selected_status == 'archived' %}selected{% endif %}>مؤرشف</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الترتيب</label>
+                <select class="form-select" name="sort" onchange="this.form.submit()">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>الأحدث</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>الأقدم</option>
+                    <option value="students" {% if selected_sort == 'students' %}selected{% endif %}>الأكثر طلاباً</option>
+                    <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>الأعلى تقييماً</option>
+                    <option value="price" {% if selected_sort == 'price' %}selected{% endif %}>السعر</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary flex-fill"><i class="fas fa-search"></i></button>
+                <a href="{% url 'teacher_courses' %}" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    {% for course in courses %}
+    <div class="col-md-4 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="fw-bold">{{ course.title }}</h5>
+                <div class="d-flex gap-2 mb-2">
+                    <span class="badge bg-{{ course.status|yesno:'success,secondary,secondary' }}">{{ course.get_status_display }}</span>
+                    <span class="text-muted small"><i class="fas fa-users"></i> {{ course.students_count|default:0 }}</span>
+                    {% if course.avg_rating %}
+                    <span class="text-warning small"><i class="fas fa-star"></i> {{ course.avg_rating|floatformat:1 }}</span>
+                    {% endif %}
+                </div>
+                <div class="btn-group w-100 mt-2">
+                    <a href="{% url 'manage_content' course.id %}" class="btn btn-sm btn-outline-info">المحتوى</a>
+                    <a href="{% url 'manage_quizzes' course.id %}" class="btn btn-sm btn-outline-warning">الاختبارات</a>
+                    <a href="{% url 'edit_course' course.id %}" class="btn btn-sm btn-outline-secondary">تعديل</a>
+                    <a href="{% url 'delete_course' course.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('هل أنت متأكد؟')">حذف</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5 text-muted">
+        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+        <p>لا توجد كورسات مطابقة</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% include 'includes/pagination.html' %}
+
+<div class="modal fade" id="addCourseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">إضافة كورس جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">{{ form.as_p }}</div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

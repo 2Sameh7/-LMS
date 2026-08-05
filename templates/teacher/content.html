@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>محتوى الكورس: {{ course.title }}</h2>
+        <a href="{% url 'teacher_courses' %}" class="btn btn-sm btn-outline-secondary">← العودة للكورسات</a>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContentModal">
+        <i class="fas fa-plus"></i> إضافة محتوى
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if contents %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>العنوان</th>
+                    <th>النوع</th>
+                    <th>الرابط/الملف</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for content in contents %}
+                <tr>
+                    <td>{{ content.order }}</td>
+                    <td>{{ content.title }}</td>
+                    <td>
+                        {% if content.content_type == 'video' %}
+                            <span class="badge bg-danger"><i class="fas fa-video"></i> فيديو</span>
+                        {% else %}
+                            <span class="badge bg-warning"><i class="fas fa-file"></i> ملف</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if content.link_or_file %}
+                            <a href="{{ content.link_or_file }}" target="_blank" class="text-primary">رابط</a>
+                        {% elif content.file_upload %}
+                            <a href="{{ content.file_upload.url }}" target="_blank" class="text-success">ملف</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td style="white-space: nowrap;">
+                        <a href="{% url 'edit_content' content.id %}" class="btn btn-sm btn-info text-white me-1">
+                            <i class="fas fa-edit"></i> تعديل
+                        </a>
+
+                        <form method="post" class="d-inline" action="{% url 'delete_content' content.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من الحذف؟')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-center text-muted py-4">لا يوجد محتوى مضاف لهذا الكورس بعد</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Add Content -->
+<div class="modal fade" id="addContentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة محتوى جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

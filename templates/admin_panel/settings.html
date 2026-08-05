@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">إعدادات النظام</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>الإعدادات العامة</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">اسم المنصة</label>
+                        <input type="text" name="platform_name" class="form-control" value="{{ settings.platform_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">البريد الإلكتروني للدعم</label>
+                        <input type="email" name="support_email" class="form-control" value="{{ settings.support_email }}">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="enable_registration" class="form-check-input" {% if settings.enable_registration %}checked{% endif %}>
+                        <label class="form-check-label">تفعيل التسجيل الجديد</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="enable_certificates" class="form-check-input" {% if settings.enable_certificates %}checked{% endif %}>
+                        <label class="form-check-label">تفعيل نظام الشهادات</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">حفظ الإعدادات</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>معلومات النظام</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <th>إصدار Django</th>
+                        <td>4.2.7</td>
+                    </tr>
+                    <tr>
+                        <th>قاعدة البيانات</th>
+                        <td>SQLite</td>
+                    </tr>
+                    <tr>
+                        <th>عدد المستخدمين</th>
+                        <td>{{ users_count|default:0 }}</td>
+                    </tr>
+                    <tr>
+                        <th>عدد الكورسات</th>
+                        <td>{{ courses_count|default:0 }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-1"><i class="fas fa-chart-bar" style="color:var(--primary-500);"></i> كشف العلامات</h2>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.85rem;">بحث</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="اسم الاختبار أو الكورس..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">النتيجة</label>
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    <option value="passed" {% if selected_status == 'passed' %}selected{% endif %}>ناجح</option>
+                    <option value="failed" {% if selected_status == 'failed' %}selected{% endif %}>غير ناجح</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الترتيب</label>
+                <select class="form-select" name="sort" onchange="this.form.submit()">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>الأحدث</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>الأقدم</option>
+                    <option value="score_high" {% if selected_sort == 'score_high' %}selected{% endif %}>الأعلى علامة</option>
+                    <option value="score_low" {% if selected_sort == 'score_low' %}selected{% endif %}>الأدنى علامة</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary flex-fill"><i class="fas fa-search"></i></button>
+                <a href="{% url 'student_scorecard' %}" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead style="background:var(--gray-50);">
+                <tr>
+                    <th style="padding:14px;font-weight:600;">الكورس</th>
+                    <th style="padding:14px;font-weight:600;">عنوان الاختبار</th>
+                    <th style="padding:14px;font-weight:600;">النتيجة</th>
+                    <th style="padding:14px;font-weight:600;">النسبة</th>
+                    <th style="padding:14px;font-weight:600;">الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in results %}
+                <tr>
+                    <td style="padding:14px;">{{ res.quiz.course.title }}</td>
+                    <td style="padding:14px;font-weight:500;">{{ res.quiz.title }}</td>
+                    <td style="padding:14px;">{{ res.score }} / {{ res.total_questions }}</td>
+                    <td style="padding:14px;"><strong>{{ res.percentage|floatformat:1 }}%</strong></td>
+                    <td style="padding:14px;">
+                        {% if res.passed %}<span class="badge bg-success">ناجح</span>
+                        {% else %}<span class="badge bg-danger">غير ناجح</span>{% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4"><i class="fas fa-pen fa-2x mb-2 d-block"></i>لم تقم بحل أي اختبارات بعد.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include 'includes/pagination.html' %}
+{% endblock %}

@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}إدارة أسئلة الاختبار - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">أسئلة اختبار: {{ quiz.title }}</h1>
+            <p class="text-muted mb-0">الكورس: {{ quiz.course.title }}</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+            <i class="fas fa-plus-circle me-2"></i>إضافة سؤال جديد
+        </button>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped align-middle" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">#</th>
+                            <th style="width: 60%;">نص السؤال والخيارات</th>
+                            <th style="width: 20%;">الإجابة الصحيحة</th>
+                            <th style="width: 15%; text-align: center;">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question in questions %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td style="white-space: pre-line;">{{ question.text }}</td>
+                            <td><span class="badge bg-success">{{ question.correct_answer }}</span></td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-info text-white me-1" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editQuestionModal"
+                                        data-id="{{ question.id }}"
+                                        data-fulltext="{{ question.text }}"
+                                        data-answer="{{ question.correct_answer }}"
+                                        onclick="populateEditModal(this)"
+                                        title="تعديل السؤال">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                
+                                <button class="btn btn-sm btn-danger" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteQuestionModal"
+                                        data-id="{{ question.id }}"
+                                        onclick="populateDeleteModal(this)"
+                                        title="حذف السؤال">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">لا توجد أسئلة مضافة لهذا الاختبار حتى الآن.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addQuestionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="" onsubmit="combineAddOptions(this)">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="text" id="add_final_text">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">إضافة سؤال جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">نص السؤال الأساسي</label>
+                        <input type="text" id="add_main_question" class="form-control" required placeholder="مثال: ما هي عاصمة المملكة العربية السعودية؟">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الخيار (A)</label>
+                            <input type="text" id="add_opt_a" class="form-control" required placeholder="الخيار A">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الخيار (B)</label>
+                            <input type="text" id="add_opt_b" class="form-control" required placeholder="الخيار B">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الخيار (C)</label>
+                            <input type="text" id="add_opt_c" class="form-control" required placeholder="الخيار C">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الخيار (D)</label>
+                            <input type="text" id="add_opt_d" class="form-control" required placeholder="الخيار D">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold text-danger">الإجابة الصحيحة</label>
+                        <select name="correct_answer" class="form-select" required>
+                            <option value="" disabled selected>اختر الإجابة الصحيحة...</option>
+                            <option value="A">الخيار (A)</option>
+                            <option value="B">الخيار (B)</option>
+                            <option value="C">الخيار (C)</option>
+                            <option value="D">الخيار (D)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ السؤال</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editQuestionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="" onsubmit="combineEditOptions(this)">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="question_id" id="edit_question_id">
+                <input type="hidden" name="text" id="edit_final_text">
+                
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">تعديل السؤال والخيارات</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">نص السؤال الأساسي</label>
+                        <input type="text" id="edit_main_question" class="form-control" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الخيار (A)</label>
+                            <input type="text" id="edit_opt_a" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الخيار (B)</label>
+                            <input type="text" id="edit_opt_b" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الخيار (C)</label>
+                            <input type="text" id="edit_opt_c" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">الخيار (D)</label>
+                            <input type="text" id="edit_opt_d" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold text-danger">الإجابة الصحيحة</label>
+                        <select name="correct_answer" id="edit_correct_answer" class="form-select" required>
+                            <option value="A">الخيار (A)</option>
+                            <option value="B">الخيار (B)</option>
+                            <option value="C">الخيار (C)</option>
+                            <option value="D">الخيار (D)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-success">حفظ التعديلات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteQuestionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="question_id" id="delete_question_id">
+                
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">تأكيد حذف السؤال</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد من رغبتك في حذف هذا السؤال والخيارات التابعة له نهائياً؟</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-danger">تأكيد الحذف</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// تجميع المدخلات عند الإضافة لترسل كحقل نصي واحد منسق
+function combineAddOptions(form) {
+    const q = document.getElementById('add_main_question').value;
+    const a = document.getElementById('add_opt_a').value;
+    const b = document.getElementById('add_opt_b').value;
+    const c = document.getElementById('add_opt_c').value;
+    const d = document.getElementById('add_opt_d').value;
+    
+    document.getElementById('add_final_text').value = `${q}\nA) ${a}\nB) ${b}\nC) ${c}\nD) ${d}`;
+}
+
+// تجميع المدخلات عند التعديل
+function combineEditOptions(form) {
+    const q = document.getElementById('edit_main_question').value;
+    const a = document.getElementById('edit_opt_a').value;
+    const b = document.getElementById('edit_opt_b').value;
+    const c = document.getElementById('edit_opt_c').value;
+    const d = document.getElementById('edit_opt_d').value;
+    
+    document.getElementById('edit_final_text').value = `${q}\nA) ${a}\nB) ${b}\nC) ${c}\nD) ${d}`;
+}
+
+// تفكيك النص المخزن ونقله إلى الحقول المنفصلة عند فتح نافذة التعديل
+function populateEditModal(button) {
+    document.getElementById('edit_question_id').value = button.getAttribute('data-id');
+    document.getElementById('edit_correct_answer').value = button.getAttribute('data-answer');
+    
+    const fullText = button.getAttribute('data-fulltext');
+    const lines = fullText.split('\n');
+    
+    let questionText = lines[0] || '';
+    let optA = '', optB = '', optC = '', optD = '';
+    
+    lines.forEach(line => {
+        if (line.startsWith('A) ')) optA = line.replace('A) ', '');
+        else if (line.startsWith('B) ')) optB = line.replace('B) ', '');
+        else if (line.startsWith('C) ')) optC = line.replace('C) ', '');
+        else if (line.startsWith('D) ')) optD = line.replace('D) ', '');
+    });
+    
+    // إذا لم تكن مقسمة بشكل افتراضي، نضع النص بالكامل في حقل السؤال
+    if(!optA && !optB && !optC && !optD) questionText = fullText;
+
+    document.getElementById('edit_main_question').value = questionText;
+    document.getElementById('edit_opt_a').value = optA;
+    document.getElementById('edit_opt_b').value = optB;
+    document.getElementById('edit_opt_c').value = optC;
+    document.getElementById('edit_opt_d').value = optD;
+}
+
+function populateDeleteModal(button) {
+    document.getElementById('delete_question_id').value = button.getAttribute('data-id');
+}
+</script>
+{% endblock %}

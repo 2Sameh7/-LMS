@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-2">
+        <i class="fas fa-chart-pie gradient-text"></i>
+        لوحة تحكم النظام
+    </h2>
+    <p class="text-muted">نظرة شاملة على أداء المنصة</p>
+</div>
+
+<!-- Stats Overview -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4 col-lg-2">
+        <div class="stat-card primary">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-value">{{ users_count }}</div>
+            <div class="stat-label">المستخدمين</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 col-lg-2">
+        <div class="stat-card success">
+            <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+            <div class="stat-value">{{ teachers_count }}</div>
+            <div class="stat-label">المعلمين</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 col-lg-2">
+        <div class="stat-card info">
+            <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+            <div class="stat-value">{{ students_count }}</div>
+            <div class="stat-label">الطلاب</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 col-lg-2">
+        <div class="stat-card warning">
+            <div class="stat-icon"><i class="fas fa-book"></i></div>
+            <div class="stat-value">{{ courses_count }}</div>
+            <div class="stat-label">الكورسات</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 col-lg-2">
+        <div class="stat-card danger">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-value">{{ published_courses }}</div>
+            <div class="stat-label">منشور</div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 col-lg-2">
+        <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+            <div class="stat-value">${{ total_revenue|floatformat:0 }}</div>
+            <div class="stat-label">الإيرادات</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-clock"></i> آخر الكورسات المضافة</span>
+                <a href="{% url 'admin_reports' %}" class="btn btn-sm btn-outline-primary">
+                    عرض التقارير <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>الكورس</th>
+                                <th>المعلم</th>
+                                <th>التصنيف</th>
+                                <th>السعر</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in recent_courses %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">{{ course.title|truncatechars:30 }}</div>
+                                </td>
+                                <td>{{ course.teacher.username }}</td>
+                                <td>{{ course.category|default:"-" }}</td>
+                                <td>${{ course.price }}</td>
+                                <td>
+                                    {% if course.status == 'published' %}
+                                        <span class="badge bg-success">منشور</span>
+                                    {% elif course.status == 'draft' %}
+                                        <span class="badge bg-secondary">مسودة</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">مؤرشف</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <br>لا توجد كورسات
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user-plus"></i>
+                آخر المستخدمين
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for user in recent_users %}
+                    <div class="list-group-item d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
+                             style="width: 40px; height: 40px;">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">{{ user.username }}</div>
+                            <small class="text-muted">{{ user.profile.get_role_display }}</small>
+                        </div>
+                        <small class="text-muted">{{ user.date_joined|timesince }}</small>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted py-4">
+                        لا يوجد مستخدمين جدد
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <i class="fas fa-cog"></i>
+                إدارة سريعة
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'admin_users' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-users-cog"></i> إدارة المستخدمين
+                    </a>
+                    <a href="{% url 'admin_categories' %}" class="btn btn-outline-success">
+                        <i class="fas fa-tags"></i> التصنيفات
+                    </a>
+                    <a href="{% url 'admin_payments' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-credit-card"></i> طرق الدفع
+                    </a>
+                    <a href="{% url 'admin_settings' %}" class="btn btn-outline-info">
+                        <i class="fas fa-sliders-h"></i> الإعدادات
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

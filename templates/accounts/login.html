@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}تسجيل الدخول - {{ site_settings.platform_name }}{% endblock %}
+
+{% block public_content %}
+<div class="auth-wrapper">
+    <div class="auth-bg">
+        <div class="auth-bg-shape shape-1"></div>
+        <div class="auth-bg-shape shape-2"></div>
+        <div class="auth-bg-shape shape-3"></div>
+    </div>
+    
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100 py-5">
+            <div class="col-lg-5 col-md-7 col-sm-10">
+                
+                <div class="auth-card slide-up">
+                    <div class="auth-card-header text-center">
+                        <a href="{% url 'landing_page' %}" class="auth-logo mb-3 d-inline-block">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>{{ site_settings.platform_name }}</span>
+                        </a>
+                        <h3 class="auth-title">مرحباً بعودتك! 👋</h3>
+                        <p class="auth-subtitle">سجل دخولك للمتابعة إلى لوحة التحكم</p>
+                    </div>
+                    
+                    <div class="auth-card-body">
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle me-2"></i>
+                            {% elif message.tags == 'error' %}
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle me-2"></i>
+                            {% endif %}
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        
+                        <form method="post" id="loginForm">
+                            {% csrf_token %}
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label" for="username">
+                                    <i class="fas fa-user me-1"></i> اسم المستخدم
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="username" 
+                                           name="username" 
+                                           placeholder="أدخل اسم المستخدم"
+                                           value="{{ request.POST.username }}"
+                                           required
+                                           autocomplete="username">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label class="form-label" for="password">
+                                    <i class="fas fa-lock me-1"></i> كلمة المرور
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-lock text-muted"></i>
+                                    </span>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="password" 
+                                           name="password" 
+                                           placeholder="أدخل كلمة المرور"
+                                           required
+                                           autocomplete="current-password">
+                                    <button type="button" 
+                                            class="btn btn-outline-secondary" 
+                                            id="togglePasswordBtn">
+                                        <i class="fas fa-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                           
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                <i class="fas fa-sign-in-alt me-2"></i> تسجيل الدخول
+                            </button>
+                        </form>
+                        
+                        <div class="text-center auth-footer">
+                            <p class="mb-0">ليس لديك حساب؟ 
+                                <a href="{% url 'register' %}" class="fw-bold text-primary text-decoration-none">إنشاء حساب جديد</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <a href="{% url 'landing_page' %}" class="text-white-50 text-decoration-none hover-white">
+                        <i class="fas fa-arrow-right me-1"></i> العودة للمنصة
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordInput = document.getElementById('password');
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        if (toggleBtn && passwordInput) {
+            toggleBtn.addEventListener('click', function() {
+                // تغيير النوع برمجياً
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    /* التنسيقات مأخوذة من الملف الأصلي لضمان ثبات المظهر */
+    .auth-wrapper { min-height: 100vh; position: relative; overflow: hidden; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .auth-bg-shape { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.1); animation: float 20s infinite ease-in-out; }
+    .auth-bg-shape.shape-1 { width: 400px; height: 400px; top: -100px; right: -100px; }
+    .auth-bg-shape.shape-2 { width: 300px; height: 300px; bottom: -50px; left: -50px; }
+    .auth-card { background: white; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); animation: slideUp 0.5s ease-out; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .auth-card-header { padding: 2rem 2rem 1rem; border-bottom: 1px solid #e9ecef; }
+    .auth-logo { color: #667eea; font-weight: 800; font-size: 1.5rem; text-decoration: none; }
+    .auth-card-body { padding: 2rem; }
+    .input-group { border: 2px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+    .input-group:focus-within { border-color: #667eea; }
+    .auth-divider { display: flex; align-items: center; text-align: center; margin: 1.5rem 0; color: #9ca3af; }
+    .auth-divider::before, .auth-divider::after { content: ''; flex: 1; border-bottom: 1px solid #e5e7eb; }
+    .auth-divider span { padding: 0 1rem; }
+</style>
+
+
+{% endblock %}

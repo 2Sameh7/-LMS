@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-2"><i class="fas fa-chart-line" style="color:var(--primary-500);"></i> التقارير والإحصائيات</h2>
+    <p class="text-muted">نظرة شاملة على أداء المنصة والكورسات</p>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card primary">
+            <div class="stat-icon"><i class="fas fa-book"></i></div>
+            <div class="stat-value">{{ total_courses }}</div>
+            <div class="stat-label">إجمالي الكورسات</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card success">
+            <div class="stat-icon"><i class="fas fa-star"></i></div>
+            <div class="stat-value">{{ avg_rating_all|floatformat:1 }}</div>
+            <div class="stat-label">متوسط التقييمات</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card info">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-value">{{ published_courses }}</div>
+            <div class="stat-label">الكورسات المنشورة</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card warning">
+            <div class="stat-icon"><i class="fas fa-users"></i></div>
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-label">إجمالي الطلاب</div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">بحث</label>
+                <input type="text" name="search" class="form-control" placeholder="اسم الكورس، المعلم، التصنيف..." value="{{ search|default:'' }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الحالة</label>
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    <option value="published" {% if selected_status == 'published' %}selected{% endif %}>منشور</option>
+                    <option value="draft" {% if selected_status == 'draft' %}selected{% endif %}>مسودة</option>
+                    <option value="archived" {% if selected_status == 'archived' %}selected{% endif %}>مؤرشف</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">التصنيف</label>
+                <select class="form-select" name="category" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الترتيب</label>
+                <select class="form-select" name="sort" onchange="this.form.submit()">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>الأحدث</option>
+                    <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>الأعلى تقييماً</option>
+                    <option value="students" {% if selected_sort == 'students' %}selected{% endif %}>الأكثر طلاباً</option>
+                    <option value="price_high" {% if selected_sort == 'price_high' %}selected{% endif %}>الأعلى سعراً</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-1">
+                <button type="submit" class="btn btn-primary flex-fill"><i class="fas fa-search ml-1"></i> بحث</button>
+                <a href="{% url 'admin_reports' %}" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
+                <button type="button" class="btn btn-outline-dark" onclick="window.print()"><i class="fas fa-print"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead style="background:var(--gray-50);">
+                <tr>
+                    <th style="padding:14px;font-weight:600;">الكورس</th>
+                    <th style="padding:14px;font-weight:600;">المعلم</th>
+                    <th style="padding:14px;font-weight:600;">التصنيف</th>
+                    <th style="padding:14px;font-weight:600;">السعر</th>
+                    <th style="padding:14px;font-weight:600;">الطلاب</th>
+                    <th style="padding:14px;font-weight:600;">التقييم</th>
+                    <th style="padding:14px;font-weight:600;">الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td style="padding:14px;"><div class="fw-bold">{{ course.title|truncatechars:30 }}</div><small class="text-muted">#{{ course.id }}</small></td>
+                    <td style="padding:14px;">{{ course.teacher.username }}</td>
+                    <td style="padding:14px;"><span class="badge bg-light text-dark">{{ course.category|default:"عام" }}</span></td>
+                    <td style="padding:14px;"><span class="fw-bold text-primary">${{ course.price }}</span></td>
+                    <td style="padding:14px;"><span class="fw-bold">{{ course.students_count|default:0 }}</span></td>
+                    <td style="padding:14px;">
+                        {% if course.avg_rating %}
+                        <span class="text-warning"><i class="fas fa-star"></i> {{ course.avg_rating|floatformat:1 }}</span>
+                        {% else %}<span class="text-muted">-</span>{% endif %}
+                    </td>
+                    <td style="padding:14px;">
+                        {% if course.status == 'published' %}<span class="badge bg-success">منشور</span>
+                        {% elif course.status == 'draft' %}<span class="badge bg-secondary">مسودة</span>
+                        {% else %}<span class="badge bg-danger">مؤرشف</span>{% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-5"><i class="fas fa-inbox fa-3x mb-3 d-block"></i>لا توجد نتائج</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include 'includes/pagination.html' %}
+
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-header" style="background:var(--gray-50);border-bottom:1px solid var(--gray-100);">
+        <h5 class="mb-0 fw-bold"><i class="fas fa-download ml-2" style="color:var(--primary-500);"></i> تصدير البيانات</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex gap-2">
+            <a href="{% url 'export_report' 'excel' %}" class="btn btn-outline-success"><i class="fas fa-file-excel ml-1"></i> Excel</a>
+            <a href="{% url 'export_report' 'pdf' %}" class="btn btn-outline-danger"><i class="fas fa-file-pdf ml-1"></i> PDF</a>
+            <a href="{% url 'export_report' 'csv' %}" class="btn btn-outline-primary"><i class="fas fa-file-csv ml-1"></i> CSV</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+<div id="sidebar-wrapper" dir="rtl">
+    <div class="sidebar-heading">
+        <h5>
+            <i class="fas fa-graduation-cap"></i>
+            {{ site_settings.platform_name|default:"منصة التميز" }}
+        </h5>
+        <small>
+            {% if request.user.profile.role == 'admin' %}
+                <i class="fas fa-shield-alt"></i> مدير النظام
+            {% elif request.user.profile.role == 'teacher' %}
+                <i class="fas fa-chalkboard-teacher"></i> {{ request.user.first_name|default:request.user.username }}
+            {% elif request.user.profile.role == 'student' %}
+                <i class="fas fa-user-graduate"></i> {{ request.user.first_name|default:request.user.username }}
+            {% endif %}
+        </small>
+    </div>
+
+    <div class="list-group list-group-flush">
+        
+        {% if request.user.profile.role == 'student' %}
+            <a href="{% url 'student_dashboard' %}" class="list-group-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+                <i class="fas fa-th-large"></i> لوحة التحكم
+            </a>
+            <a href="{% url 'course_list' %}" class="list-group-item {% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">
+                <i class="fas fa-compass"></i> تصفح الكورسات
+            </a>
+            <a href="{% url 'student_enrollments_history' %}" class="list-group-item {% if request.resolver_match.url_name == 'student_enrollments_history' %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i> طلبات التسجيل
+            </a>
+            <a href="{% url 'student_scorecard' %}" class="list-group-item {% if request.resolver_match.url_name == 'student_scorecard' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i> كشف العلامات
+            </a>
+            <a href="{% url 'student_certificates_history' %}" class="list-group-item {% if request.resolver_match.url_name == 'student_certificates_history' %}active{% endif %}">
+                <i class="fas fa-award"></i> شهاداتي
+            </a>
+        {% endif %}
+
+        {% if request.user.profile.role == 'teacher' %}
+            <a href="{% url 'teacher_dashboard' %}" class="list-group-item {% if request.resolver_match.url_name == 'teacher_dashboard' %}active{% endif %}">
+                <i class="fas fa-chart-pie"></i> لوحة التحكم
+            </a>
+            <a href="{% url 'teacher_courses' %}" class="list-group-item {% if request.resolver_match.url_name == 'teacher_courses' %}active{% endif %}">
+                <i class="fas fa-book-open"></i> كورساتي
+            </a>
+            <a href="{% url 'teacher_students' %}" class="list-group-item {% if request.resolver_match.url_name == 'teacher_students' %}active{% endif %}">
+                <i class="fas fa-users"></i> طلابي
+            </a>
+            <a href="{% url 'teacher_certificates' %}" class="list-group-item {% if request.resolver_match.url_name == 'teacher_certificates' %}active{% endif %}">
+                <i class="fas fa-stamp"></i> طلبات الشهادات
+            </a>
+            <a href="{% url 'teacher_performance' %}" class="list-group-item {% if request.resolver_match.url_name == 'teacher_performance' %}active{% endif %}">
+                <i class="fas fa-trophy"></i> الأداء العام
+            </a>
+        {% endif %}
+
+        {% if request.user.profile.role == 'admin' %}
+            <a href="{% url 'admin_dashboard' %}" class="list-group-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i> لوحة الإدارة
+            </a>
+            <a href="{% url 'admin_users' %}" class="list-group-item {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+                <i class="fas fa-users-cog"></i> المستخدمون
+            </a>
+            <a href="{% url 'admin_categories' %}" class="list-group-item {% if request.resolver_match.url_name == 'admin_categories' %}active{% endif %}">
+                <i class="fas fa-tags"></i> التصنيفات
+            </a>
+            <a href="{% url 'admin_payments' %}" class="list-group-item {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}">
+                <i class="fas fa-credit-card"></i> الدفع
+            </a>
+            <a href="{% url 'admin_reports' %}" class="list-group-item {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i> التقارير
+            </a>
+            <a href="{% url 'admin_settings' %}" class="list-group-item {% if request.resolver_match.url_name == 'admin_settings' %}active{% endif %}">
+                <i class="fas fa-sliders-h"></i> الإعدادات
+            </a>
+        {% endif %}
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 0.5rem; padding-top: 0.5rem;">
+            <a href="{% url 'profile' %}" class="list-group-item">
+                <i class="fas fa-user-cog"></i> الملف الشخصي
+            </a>
+            <a href="{% url 'logout' %}" class="list-group-item" style="color: var(--rose-400) !important;">
+                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </a>
+        </div>
+    </div>
+</div>
+
+<button id="sidebar-toggle" class="d-lg-none" onclick="document.getElementById('sidebar-wrapper').classList.toggle('show')" 
+    style="position:fixed;top:1rem;right:1rem;z-index:1050;background:var(--gradient-primary);color:#fff;border:none;width:44px;height:44px;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;">
+    <i class="fas fa-bars"></i>
+</button>

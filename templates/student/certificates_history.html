@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-1"><i class="fas fa-award" style="color:var(--primary-500);"></i> شهاداتي</h2>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-600" style="font-size:0.85rem;">بحث</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="اسم الكورس..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الحالة</label>
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>قيد المراجعة</option>
+                    <option value="issued" {% if selected_status == 'issued' %}selected{% endif %}>تم الإصدار</option>
+                    <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>مرفوض</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الترتيب</label>
+                <select class="form-select" name="sort" onchange="this.form.submit()">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>الأحدث</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>الأقدم</option>
+                    <option value="course" {% if selected_sort == 'course' %}selected{% endif %}>اسم الكورس</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex gap-1">
+                <button type="submit" class="btn btn-primary flex-fill"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead style="background:var(--gray-50);">
+                <tr>
+                    <th style="padding:14px;font-weight:600;">الكورس</th>
+                    <th style="padding:14px;font-weight:600;">تاريخ الطلب</th>
+                    <th style="padding:14px;font-weight:600;">الحالة</th>
+                    <th style="padding:14px;font-weight:600;">الإجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cr in requests %}
+                <tr>
+                    <td style="padding:14px;font-weight:500;">{{ cr.course.title }}</td>
+                    <td style="padding:14px;">{{ cr.request_date|date:"Y-m-d" }}</td>
+                    <td style="padding:14px;">
+                        {% if cr.status == 'issued' %}<span class="badge bg-success">تم الإصدار</span>
+                        {% elif cr.status == 'pending' %}<span class="badge bg-warning text-dark">قيد المراجعة</span>
+                        {% else %}<span class="badge bg-danger">مرفوض</span>{% endif %}
+                    </td>
+                    <td style="padding:14px;">
+                        {% if cr.status == 'issued' %}
+                            <a href="{% url 'download_certificate_pdf' cr.id %}" class="btn btn-sm btn-primary"><i class="fas fa-download ml-1"></i> تحميل PDF</a>
+                        {% else %}
+                            <button class="btn btn-sm btn-secondary" disabled>غير جاهز</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4"><i class="fas fa-award fa-2x mb-2 d-block"></i>لا توجد طلبات شهادات.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include 'includes/pagination.html' %}
+{% endblock %}

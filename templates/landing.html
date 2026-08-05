@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ site_settings.platform_name|default:"منصة التميز التعليمية" }}{% endblock %}
+
+{% block public_content %}
+<style>
+    .hero { background: var(--gradient-primary); padding: 80px 0 100px; position: relative; overflow: hidden; }
+    .hero::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); opacity:0.4; }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-icon { font-size: 5rem; opacity: 0.15; position: absolute; left: 10%; top: 20%; animation: float 6s ease-in-out infinite; }
+    .stat-pill { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); padding: 0.5rem 1.25rem; border-radius: var(--radius-full); color: #fff; font-size: 0.85rem; font-weight: 600; }
+    .stat-pill i { font-size: 1rem; }
+    .section-title { font-size: 2rem; font-weight: 800; color: var(--gray-800); margin-bottom: 0.5rem; }
+    .section-subtitle { color: var(--gray-500); font-size: 1rem; max-width: 600px; margin: 0 auto 3rem; }
+    .feature-card { background: #fff; border-radius: var(--radius-xl); padding: 2rem; text-align: center; border: 1px solid var(--gray-100); transition: all var(--transition-default); height: 100%; }
+    .feature-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-xl); border-color: var(--primary-200); }
+    .feature-icon { width: 70px; height: 70px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; margin: 0 auto 1.25rem; transition: transform var(--transition-default); }
+    .feature-card:hover .feature-icon { transform: scale(1.1) rotate(5deg); }
+    .course-card { background: #fff; border-radius: var(--radius-xl); overflow: hidden; border: 1px solid var(--gray-100); transition: all var(--transition-default); height: 100%; display: flex; flex-direction: column; }
+    .course-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-xl); }
+    .course-image { height: 180px; position: relative; overflow: hidden; }
+    .course-image-bg { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: rgba(255,255,255,0.6); }
+    .course-badge { position: absolute; top: 1rem; right: 1rem; }
+    .course-body { padding: 1.25rem; flex: 1; display: flex; flex-direction: column; }
+    .course-category { display: inline-block; background: var(--primary-50); color: var(--primary-600); padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600; margin-bottom: 0.75rem; }
+    .course-title { font-size: 1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem; line-height: 1.4; }
+    .course-desc { color: var(--gray-500); font-size: 0.85rem; line-height: 1.6; flex: 1; }
+    .course-meta { display: flex; align-items: center; justify-content: space-between; padding-top: 1rem; border-top: 1px solid var(--gray-100); margin-top: auto; }
+    .course-teacher { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--gray-600); }
+    .teacher-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; font-weight: 700; }
+    .course-price { font-weight: 800; color: var(--primary-600); font-size: 1rem; }
+    .course-price.free { color: var(--emerald-500); }
+    .cta-section { background: var(--gradient-primary); padding: 80px 0; position: relative; overflow: hidden; }
+    .cta-section::before { content:''; position:absolute; width:300px; height:300px; border-radius:50%; background:rgba(255,255,255,0.05); top:-100px; left:-100px; }
+    .cta-section::after { content:''; position:absolute; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.05); bottom:-50px; right:-50px; }
+    .footer-dark { background: var(--gray-900); color: var(--gray-400); padding: 4rem 0 2rem; }
+    .footer-dark a { color: var(--gray-400); transition: color var(--transition-fast); }
+    .footer-dark a:hover { color: #fff; }
+    .footer-heading { color: #fff; font-weight: 700; font-size: 1rem; margin-bottom: 1.25rem; }
+    .footer-links { list-style: none; padding: 0; margin: 0; }
+    .footer-links li { margin-bottom: 0.6rem; }
+    .footer-links a { font-size: 0.9rem; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 2rem; margin-top: 2rem; text-align: center; font-size: 0.85rem; }
+    .social-link { width: 40px; height: 40px; border-radius: var(--radius-md); background: rgba(255,255,255,0.08); display: inline-flex; align-items: center; justify-content: center; color: var(--gray-400); transition: all var(--transition-fast); }
+    .social-link:hover { background: var(--gradient-primary); color: #fff; transform: translateY(-3px); }
+</style>
+
+<!-- HERO -->
+<section class="hero">
+    <i class="fas fa-graduation-cap hero-icon"></i>
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-7 text-white">
+                <h1 style="font-size:2.75rem;font-weight:900;line-height:1.3;margin-bottom:1.25rem;">
+                    تعلّم بلا حدود<br>
+                    <span style="background:linear-gradient(90deg,#fbbf24,#f59e0b,#fcd34d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">بصيرة وتميّز</span>
+                </h1>
+                <p style="font-size:1.1rem;opacity:0.9;max-width:500px;line-height:1.8;margin-bottom:2rem;">
+                    منصة تعليمية متكاملة تربطك بأفضل المعلمين والكفاءات في الجامعات السورية. تابع دروسك، اجتز اختباراتك، واحصل على شهاداتك المعتمدة.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="{% url 'register' %}" style="background:#fff;color:var(--primary-700);padding:0.8rem 2rem;border-radius:var(--radius-lg);font-weight:700;font-size:1rem;text-decoration:none;box-shadow:var(--shadow-lg);transition:all var(--transition-default);display:inline-flex;align-items:center;gap:0.5rem;">
+                        <i class="fas fa-rocket"></i> ابدأ رحلتك الآن
+                    </a>
+                    <a href="{% url 'login' %}" style="border:2px solid rgba(255,255,255,0.4);color:#fff;padding:0.8rem 2rem;border-radius:var(--radius-lg);font-weight:600;font-size:1rem;text-decoration:none;transition:all var(--transition-default);display:inline-flex;align-items:center;gap:0.5rem;">
+                        <i class="fas fa-door-open"></i> تسجيل الدخول
+                    </a>
+                </div>
+                <div class="d-flex flex-wrap gap-3">
+                    <span class="stat-pill"><i class="fas fa-user-graduate"></i> {{ courses.count|default:"1000" }}+ طالب</span>
+                    <span class="stat-pill"><i class="fas fa-book-open"></i> {{ categories.count|default:"50" }}+ كورس</span>
+                    <span class="stat-pill"><i class="fas fa-chalkboard-teacher"></i> 20+ معلم</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURES -->
+<section style="padding:80px 0;background:var(--gray-50);">
+    <div class="container text-center">
+        <h2 class="section-title">لماذا تختار منصتنا؟</h2>
+        <p class="section-subtitle">نقدم لك تجربة تعليمية متكاملة تجمع بين الجودة والمرونة</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--gradient-primary);">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;">معلمون كفاءون</h5>
+                    <p style="color:var(--gray-500);font-size:0.9rem;margin:0;">أفضل الكفاءات الأكاديمية في الجامعات السورية بخبرات واسعة في التدريس والبحث العلمي.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--gradient-emerald);">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;">شهادات معتمدة</h5>
+                    <p style="color:var(--gray-500);font-size:0.9rem;margin:0;">احصل على شهادة إتمام رقمية معتمدة يمكنك تحميلها بصيغة PDF لتعزيز سيرتك الذاتية.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--gradient-amber);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;">تعلم في أي وقت</h5>
+                    <p style="color:var(--gray-500);font-size:0.9rem;margin:0;">تابع محاضراتك ومحتواك التعليمي في الوقت والمكان الذي يناسبك بدون قيود.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--gradient-cyan);">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;">محتوى عملي</h5>
+                    <p style="color:var(--gray-500);font-size:0.9rem;margin:0;">مشاريع تطبيقية وتمارين عملية ترافقك خطوة بخطوة لضمان فهمك الكامل للمادة.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--gradient-violet);">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;">مجتمع تفاعلي</h5>
+                    <p style="color:var(--gray-500);font-size:0.9rem;margin:0;">تواصل مع زملائك ومعلميك وشارك الأفكار والخبرات في بيئة تعليمية متعاونة.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background:var(--gradient-rose);">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h5 style="font-weight:700;margin-bottom:0.75rem;">دعم فني متميز</h5>
+                    <p style="color:var(--gray-500);font-size:0.9rem;margin:0;">فريق دعم فني متخصص جاهز لمساعدتك والإجابة على استفساراتك في أي وقت.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COURSES -->
+{% if courses %}
+<section style="padding:80px 0;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">أحدث الكورسات المتاحة</h2>
+            <p class="section-subtitle">اكتشف كورساتنا المميزة وابدأ رحلتك التعليمية الآن</p>
+        </div>
+        <div class="row g-4">
+            {% for course in courses %}
+            <div class="col-md-4">
+                <div class="course-card">
+                    <div class="course-image">
+                        {% if course.category.name %}
+                            {% if 'برمجة' in course.category.name %}
+                                <div class="course-image-bg" style="background:var(--gradient-primary);">
+                            {% elif 'ذكاء' in course.category.name %}
+                                <div class="course-image-bg" style="background:var(--gradient-violet);">
+                            {% elif 'رياضيات' in course.category.name %}
+                                <div class="course-image-bg" style="background:var(--gradient-cyan);">
+                            {% elif 'فيزياء' in course.category.name %}
+                                <div class="course-image-bg" style="background:var(--gradient-amber);">
+                            {% elif 'شبكات' in course.category.name %}
+                                <div class="course-image-bg" style="background:var(--gradient-emerald);">
+                            {% else %}
+                                <div class="course-image-bg" style="background:var(--gradient-rose);">
+                            {% endif %}
+                                <i class="fas {% if 'برمجة' in course.category.name %}fa-code{% elif 'ذكاء' in course.category.name %}fa-brain{% elif 'رياضيات' in course.category.name %}fa-square-root-variable{% elif 'فيزياء' in course.category.name %}fa-atom{% elif 'شبكات' in course.category.name %}fa-network-wired{% else %}fa-book{% endif %}"></i>
+                            </div>
+                        {% else %}
+                            <div class="course-image-bg" style="background:var(--gradient-primary);">
+                                <i class="fas fa-book"></i>
+                            </div>
+                        {% endif %}
+                        {% if course.price == 0 %}
+                            <span class="course-badge"><span class="badge badge-success" style="font-size:0.75rem;padding:0.4rem 0.9rem;">مجاني</span></span>
+                        {% endif %}
+                    </div>
+                    <div class="course-body">
+                        <span class="course-category">{{ course.category.name|default:"عام" }}</span>
+                        <h6 class="course-title">{{ course.title }}</h6>
+                        <p class="course-desc">{{ course.description|truncatewords:12 }}</p>
+                        <div class="course-meta">
+                            <div class="course-teacher">
+                                <div class="teacher-avatar">{{ course.teacher.first_name.0|default:course.teacher.username.0 }}</div>
+                                <span>{{ course.teacher.first_name|default:course.teacher.username }}</span>
+                            </div>
+                            <span class="course-price {% if course.price == 0 %}free{% endif %}">
+                                {% if course.price == 0 %}مجاناً{% else %}{{ course.price }} ل.س{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{% url 'course_list' %}" class="btn btn-primary btn-lg" style="padding:0.8rem 2.5rem;">
+                <i class="fas fa-arrow-left ml-2"></i> عرض جميع الكورسات
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="container text-center position-relative" style="z-index:1;">
+        <h2 style="color:#fff;font-size:2.25rem;font-weight:900;margin-bottom:1rem;">مستعد للبدء في رحلتك التعليمية؟</h2>
+        <p style="color:rgba(255,255,255,0.85);font-size:1.1rem;max-width:550px;margin:0 auto 2rem;">
+            انضم إلى مئات الطلاب واحصل على أفضل التعليم من كفاءات جامعية متميزة.
+        </p>
+        <a href="{% url 'register' %}" style="background:#fff;color:var(--primary-700);padding:0.9rem 2.5rem;border-radius:var(--radius-lg);font-weight:700;font-size:1.05rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;box-shadow:var(--shadow-xl);transition:all var(--transition-default);">
+            <i class="fas fa-user-plus"></i> سجّل الآن مجاناً
+        </a>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer-dark">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <h6 class="footer-heading">
+                    <i class="fas fa-graduation-cap ml-2" style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"></i>
+                    {{ site_settings.platform_name|default:"منصة التميز التعليمية" }}
+                </h6>
+                <p style="font-size:0.9rem;line-height:1.8;margin-bottom:1.25rem;">منصة تعليمية إلكترونية متكاملة تهدف إلى تقديم أفضل المحتويات التعليمية من أفضل الكفاءات الأكاديمية في سوريا.</p>
+                <div class="d-flex gap-2">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <h6 class="footer-heading">روابط سريعة</h6>
+                <ul class="footer-links">
+                    <li><a href="{% url 'landing_page' %}">الرئيسية</a></li>
+                    <li><a href="{% url 'course_list' %}">الكورسات</a></li>
+                    <li><a href="{% url 'register' %}">التسجيل</a></li>
+                    <li><a href="{% url 'login' %}">تسجيل الدخول</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3">
+                <h6 class="footer-heading">التصنيفات</h6>
+                <ul class="footer-links">
+                    {% for cat in categories %}
+                    <li><a href="{% url 'course_list' %}?category={{ cat.id }}">{{ cat.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-lg-3">
+                <h6 class="footer-heading">تواصل معنا</h6>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope ml-2"></i> {{ site_settings.support_email|default:"support@lms.sy" }}</li>
+                    <li><i class="fas fa-phone ml-2"></i> 011-2345678</li>
+                    <li><i class="fas fa-map-marker-alt ml-2"></i> دمشق، سوريا</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2024 {{ site_settings.platform_name|default:"منصة التميز التعليمية" }}. جميع الحقوق محفوظة.</span>
+        </div>
+    </div>
+</footer>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 style="font-weight:800;color:var(--gray-800);margin-bottom:0.25rem;">
+        <i class="fas fa-compass ml-2" style="color:var(--primary-500);"></i>تصفح الكورسات
+    </h2>
+    <p style="color:var(--gray-500);margin:0;">استكشف كورساتنا المتاحة واختر ما يناسبك.</p>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-600" style="font-size:0.85rem;">بحث ذكي</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background:var(--gray-50);border-color:var(--gray-200);border-radius:0 var(--radius-md) var(--radius-md) 0;">
+                        <i class="fas fa-search" style="color:var(--gray-400);"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control" placeholder="اسم الكورس، المعلم، التصنيف..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">التصنيف</label>
+                <select class="form-select" name="category">
+                    <option value="">الكل</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">المعلم</label>
+                <select class="form-select" name="teacher">
+                    <option value="">الكل</option>
+                    {% for t in teachers %}
+                    <option value="{{ t.username }}" {% if selected_teacher == t.username %}selected{% endif %}>{{ t.first_name|default:t.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الترتيب</label>
+                <select class="form-select" name="sort">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>الأحدث</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>الأقدم</option>
+                    <option value="price_low" {% if selected_sort == 'price_low' %}selected{% endif %}>السعر: منخفض→عالي</option>
+                    <option value="price_high" {% if selected_sort == 'price_high' %}selected{% endif %}>السعر: عالي→منخفض</option>
+                    <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>الأعلى تقييماً</option>
+                    <option value="students" {% if selected_sort == 'students' %}selected{% endif %}>الأكثر طلاباً</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="col-12">
+                <div class="d-flex gap-2 flex-wrap align-items-center">
+                    <div class="input-group" style="max-width:150px;">
+                        <span class="input-group-text" style="font-size:0.8rem;">من</span>
+                        <input type="number" name="price_min" class="form-control form-control-sm" placeholder="0" value="{{ price_min|default:'' }}" min="0">
+                    </div>
+                    <div class="input-group" style="max-width:150px;">
+                        <span class="input-group-text" style="font-size:0.8rem;">إلى</span>
+                        <input type="number" name="price_max" class="form-control form-control-sm" placeholder="10000" value="{{ price_max|default:'' }}" min="0">
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="free" value="1" id="freeFilter" {% if free_only %}checked{% endif %}>
+                        <label class="form-check-label" for="freeFilter" style="font-size:0.85rem;">مجاني فقط</label>
+                    </div>
+                    <a href="{% url 'course_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-times ml-1"></i> مسح الفلاتر
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for course in courses %}
+    <div class="col-lg-4 col-md-6">
+        <div class="course-card" style="background:#fff;border-radius:var(--radius-xl);overflow:hidden;border:1px solid var(--gray-100);transition:all var(--transition-default);height:100%;display:flex;flex-direction:column;">
+            <div style="height:160px;position:relative;overflow:hidden;">
+                {% if course.category.name %}
+                    {% if 'برمجة' in course.category.name %}
+                        <div style="width:100%;height:100%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;">
+                    {% elif 'ذكاء' in course.category.name %}
+                        <div style="width:100%;height:100%;background:var(--gradient-violet);display:flex;align-items:center;justify-content:center;">
+                    {% elif 'رياضيات' in course.category.name %}
+                        <div style="width:100%;height:100%;background:var(--gradient-cyan);display:flex;align-items:center;justify-content:center;">
+                    {% elif 'فيزياء' in course.category.name %}
+                        <div style="width:100%;height:100%;background:var(--gradient-amber);display:flex;align-items:center;justify-content:center;">
+                    {% elif 'شبكات' in course.category.name %}
+                        <div style="width:100%;height:100%;background:var(--gradient-emerald);display:flex;align-items:center;justify-content:center;">
+                    {% else %}
+                        <div style="width:100%;height:100%;background:var(--gradient-rose);display:flex;align-items:center;justify-content:center;">
+                    {% endif %}
+                        <i class="fas {% if 'برمجة' in course.category.name %}fa-code{% elif 'ذكاء' in course.category.name %}fa-brain{% elif 'رياضيات' in course.category.name %}fa-square-root-variable{% elif 'فيزياء' in course.category.name %}fa-atom{% elif 'شبكات' in course.category.name %}fa-network-wired{% else %}fa-book{% endif %}" style="font-size:2.5rem;color:rgba(255,255,255,0.5);"></i>
+                    </div>
+                {% else %}
+                    <div style="width:100%;height:100%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-book" style="font-size:2.5rem;color:rgba(255,255,255,0.5);"></i>
+                    </div>
+                {% endif %}
+                {% if course.price == 0 %}
+                    <span class="badge badge-success" style="position:absolute;top:0.75rem;right:0.75rem;font-size:0.75rem;padding:0.35rem 0.9rem;">مجاني</span>
+                {% endif %}
+            </div>
+            <div style="padding:1.25rem;flex:1;display:flex;flex-direction:column;">
+                <span style="display:inline-block;background:var(--primary-50);color:var(--primary-600);padding:0.2rem 0.7rem;border-radius:var(--radius-full);font-size:0.7rem;font-weight:600;margin-bottom:0.6rem;width:fit-content;">{{ course.category.name|default:"عام" }}</span>
+                <h6 style="font-size:1rem;font-weight:700;color:var(--gray-800);margin-bottom:0.4rem;line-height:1.4;">{{ course.title }}</h6>
+                <p style="color:var(--gray-400);font-size:0.82rem;line-height:1.6;flex:1;">{{ course.description|truncatewords:12 }}</p>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding-top:0.75rem;border-top:1px solid var(--gray-100);margin-top:auto;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;color:var(--gray-500);">
+                        <div style="width:28px;height:28px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.65rem;font-weight:700;">
+                            {{ course.teacher.first_name.0|default:course.teacher.username.0 }}
+                        </div>
+                        <span>{{ course.teacher.first_name|default:course.teacher.username }}</span>
+                    </div>
+                    <span style="font-weight:800;color:{% if course.price == 0 %}var(--emerald-500){% else %}var(--primary-600){% endif %};font-size:0.9rem;">
+                        {% if course.price == 0 %}مجاناً{% else %}{{ course.price }} ل.س{% endif %}
+                    </span>
+                </div>
+            </div>
+            <a href="{% url 'course_detail' course.id %}" style="display:block;text-align:center;padding:0.75rem;background:var(--gray-50);color:var(--primary-600);font-weight:700;font-size:0.85rem;text-decoration:none;border-top:1px solid var(--gray-100);transition:all var(--transition-fast);">
+                <i class="fas fa-eye ml-1"></i> عرض التفاصيل
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-inbox" style="font-size:3rem;color:var(--gray-300);margin-bottom:1rem;display:block;"></i>
+            <h5 style="color:var(--gray-500);font-weight:600;">لا توجد نتائج مطابقة لبحثك</h5>
+            <p style="color:var(--gray-400);">جرّب تغيير كلمات البحث أو الفلاتر المستخدمة.</p>
+            <a href="{% url 'course_list' %}" class="btn btn-outline-primary mt-2"><i class="fas fa-times ml-1"></i> مسح الفلاتر</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% include 'includes/pagination.html' %}
+{% endblock %}

@@ -1,0 +1,97 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm py-3" dir="rtl">
+    <div class="container">
+        <a class="navbar-brand font-weight-bold d-flex align-items-center ml-4" href="{% url 'landing_page' %}">
+            <i class="fas fa-graduation-cap text-primary ml-2" style="font-size: 1.75rem;"></i>
+            <span>{{ system_settings.platform_name|default:"منصة التعليم الإلكتروني" }}</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="تبديل القائمة">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav mr-0 ml-auto p-0 text-right">
+                <li class="nav-item">
+                    <a class="nav-link px-3" href="{% url 'landing_page' %}">
+                        <i class="fas fa-home ml-1"></i> الرئيسية
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3" href="{% url 'course_list' %}">
+                        <i class="fas fa-book ml-1"></i> تصفح الكورسات
+                    </a>
+                </li>
+
+                {% if request.user.is_authenticated and request.user.profile.role == 'student' %}
+                    <li class="nav-item border-right border-secondary mx-1 d-none d-lg-block"></li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'student_enrollments_history' %}active font-weight-bold text-primary{% endif %}" href="{% url 'student_enrollments_history' %}">
+                            <i class="fas fa-tasks ml-1"></i> تتبع طلبات التسجيل
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'student_scorecard' %}active font-weight-bold text-primary{% endif %}" href="{% url 'student_scorecard' %}">
+                            <i class="fas fa-poll ml-1"></i> كشف العلامات
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link px-3 {% if request.resolver_match.url_name == 'student_certificates_history' %}active font-weight-bold text-primary{% endif %}" href="{% url 'student_certificates_history' %}">
+                            <i class="fas fa-certificate ml-1"></i> شهاداتي المعتمدة
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% if request.user.is_authenticated and request.user.profile.role == 'teacher' %}
+                    <li class="nav-item border-right border-secondary mx-1 d-none d-lg-block"></li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 text-success font-weight-bold" href="{% url 'teacher_dashboard' %}">
+                            <i class="fas fa-chalkboard-teacher ml-1"></i> لوحة تحكم المعلم
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% if request.user.is_authenticated and request.user.profile.role == 'admin' %}
+                    <li class="nav-item border-right border-secondary mx-1 d-none d-lg-block"></li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 text-warning font-weight-bold" href="{% url 'admin_dashboard' %}">
+                            <i class="fas fa-user-shield ml-1"></i> لوحة تحكم الإدارة
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav mr-auto ml-0 p-0 text-right mt-2 mt-lg-0">
+                {% if request.user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle btn btn-outline-light px-3 text-white" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user-circle ml-1"></i> أهلاً بك، {{ request.user.username }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-left text-right shadow" aria-labelledby="userDropdown">
+                            <a class="dropdown-menu-item dropdown-item px-3 py-2" href="{% url 'profile' %}">
+                                <i class="fas fa-id-card text-muted ml-2"></i> الملف الشخصي
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-menu-item dropdown-item px-3 py-2 text-danger" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt ml-2"></i> تسجيل الخروج
+                            </a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item mb-2 mb-lg-0 ml-lg-2">
+                        <a class="btn btn-outline-primary text-primary px-4 font-weight-bold" href="{% url 'register' %}">
+                            <i class="fas fa-user-plus ml-1"></i> إنشاء حساب جديد
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary text-white px-4 font-weight-bold shadow-sm" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt ml-1"></i> تسجيل الدخول
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

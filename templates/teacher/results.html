@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h2>نتائج الاختبار: {{ quiz.title }}</h2>
+    <a href="{% url 'manage_quizzes' quiz.course.id %}" class="btn btn-sm btn-outline-secondary">
+        ← العودة للاختبارات
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            عدد الأسئلة: {{ quiz.questions.count }} | 
+            الحالة: الحالة: 
+                <span class="badge {% if quiz.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                    {{ quiz.get_status_display }}
+                </span>
+        </div>
+        
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>الطالب</th>
+                    <th>تاريخ الإجابة</th>
+                    <th>الدرجة</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                        لا توجد نتائج مسجلة حتى الآن
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-1"><i class="fas fa-user-graduate" style="color:var(--primary-500);"></i> الطلاب المسجلون</h2>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">بحث</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="اسم الطالب أو الكورس..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الكورس</label>
+                <select class="form-select" name="course" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    {% for c in teacher_courses %}
+                    <option value="{{ c.id }}" {% if selected_course == c.id|stringformat:"s" %}selected{% endif %}>{{ c.title|truncatechars:20 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الحالة</label>
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>مقبول</option>
+                    <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>قيد المراجعة</option>
+                    <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>مرفوض</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الترتيب</label>
+                <select class="form-select" name="sort" onchange="this.form.submit()">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>الأحدث</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>الأقدم</option>
+                    <option value="student" {% if selected_sort == 'student' %}selected{% endif %}>اسم الطالب</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-flex gap-1">
+                <button type="submit" class="btn btn-primary flex-fill"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead style="background:var(--gray-50);">
+                <tr>
+                    <th style="padding:14px;font-weight:600;">الطالب</th>
+                    <th style="padding:14px;font-weight:600;">الكورس</th>
+                    <th style="padding:14px;font-weight:600;">تاريخ التسجيل</th>
+                    <th style="padding:14px;font-weight:600;">الحالة</th>
+                    <th style="padding:14px;font-weight:600;">إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                <tr>
+                    <td style="padding:14px;font-weight:500;">{{ enrollment.student.username }}</td>
+                    <td style="padding:14px;">{{ enrollment.course.title }}</td>
+                    <td style="padding:14px;">{{ enrollment.enrolled_at|date:"Y-m-d" }}</td>
+                    <td style="padding:14px;">
+                        {% if enrollment.status == 'approved' %}<span class="badge bg-success">مقبول</span>
+                        {% elif enrollment.status == 'pending' %}<span class="badge bg-warning text-dark">قيد المراجعة</span>
+                        {% else %}<span class="badge bg-danger">مرفوض</span>{% endif %}
+                    </td>
+                    <td style="padding:14px;">
+                        {% if enrollment.status == 'pending' %}
+                        <a href="{% url 'update_enrollment' enrollment.id 'approved' %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> قبول</a>
+                        <a href="{% url 'update_enrollment' enrollment.id 'rejected' %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> رفض</a>
+                        {% else %}
+                        <span class="text-muted small">تمت المعالجة</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4"><i class="fas fa-users fa-2x mb-2 d-block"></i>لا توجد نتائج</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include 'includes/pagination.html' %}
+{% endblock %}

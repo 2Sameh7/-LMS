@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-2"><i class="fas fa-users-cog" style="color:var(--primary-500);"></i> إدارة المستخدمين</h2>
+    <p class="text-muted">بحث وتصفية وإدارة جميع المستخدمين</p>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-600" style="font-size:0.85rem;">بحث</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="اسم المستخدم، البريد، الاسم..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الدور</label>
+                <select class="form-select" name="role" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    <option value="admin" {% if selected_role == 'admin' %}selected{% endif %}>مدير</option>
+                    <option value="teacher" {% if selected_role == 'teacher' %}selected{% endif %}>معلم</option>
+                    <option value="student" {% if selected_role == 'student' %}selected{% endif %}>طالب</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الحالة</label>
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    <option value="active" {% if selected_status == 'active' %}selected{% endif %}>نشط</option>
+                    <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>محظور</option>
+                    <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>بانتظار الموافقة</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الترتيب</label>
+                <select class="form-select" name="sort" onchange="this.form.submit()">
+                    <option value="newest" {% if selected_sort == 'newest' %}selected{% endif %}>الأحدث</option>
+                    <option value="oldest" {% if selected_sort == 'oldest' %}selected{% endif %}>الأقدم</option>
+                    <option value="username" {% if selected_sort == 'username' %}selected{% endif %}>اسم المستخدم</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary flex-fill"><i class="fas fa-search"></i></button>
+                <a href="{% url 'admin_users' %}" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead style="background:var(--gray-50);">
+                <tr>
+                    <th style="padding:14px;font-weight:600;">المستخدم</th>
+                    <th style="padding:14px;font-weight:600;">البريد الإلكتروني</th>
+                    <th style="padding:14px;font-weight:600;">الدور</th>
+                    <th style="padding:14px;font-weight:600;">الحالة والشهادة</th>
+                    <th style="padding:14px;font-weight:600;">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td style="padding:14px;font-weight:500;">{{ u.username }}</td>
+                    <td style="padding:14px;color:var(--gray-500);">{{ u.email }}</td>
+                    <td style="padding:14px;">
+                        {% if u.profile.role == 'admin' %}
+                            <span class="badge bg-danger">مدير</span>
+                        {% elif u.profile.role == 'teacher' %}
+                            <span class="badge bg-primary">معلم</span>
+                        {% else %}
+                            <span class="badge bg-info">طالب</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:14px;">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            {% if u.profile.role == 'teacher' and not u.profile.is_approved %}
+                                <span class="badge bg-warning text-dark">بانتظار الموافقة</span>
+                            {% elif u.is_active %}
+                                <span class="badge bg-success">نشط</span>
+                            {% else %}
+                                <span class="badge bg-danger">محظور</span>
+                            {% endif %}
+                            {% if u.profile.role == 'teacher' and u.profile.certificate %}
+                                <a href="{{ u.profile.certificate.url }}" target="_blank" class="badge bg-info text-decoration-none">
+                                    <i class="fas fa-eye"></i> الشهادة
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="padding:14px;">
+                        <form method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ u.id }}">
+                            {% if not u.profile.is_approved and u.profile.role == 'teacher' %}
+                                <a href="{% url 'approve_user' u.profile.pk %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> موافقة</a>
+                            {% elif u.is_active %}
+                                <input type="hidden" name="action" value="ban">
+                                <button type="submit" class="btn btn-sm btn-warning"><i class="fas fa-ban"></i> حظر</button>
+                            {% else %}
+                                <input type="hidden" name="action" value="unban">
+                                <button type="submit" class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i> إلغاء الحظر</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-5">
+                        <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                        لا توجد نتائج مطابقة
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% include 'includes/pagination.html' %}
+{% endblock %}

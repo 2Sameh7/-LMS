@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1 text-danger">500</h1>
+            <h2 class="mb-4">خطأ في الخادم</h2>
+            <p class="text-muted mb-4">حدث خطأ غير متوقع. يرجى المحاولة لاحقاً.</p>
+            <a href="{% url 'landing_page' %}" class="btn btn-primary">
+                <i class="fas fa-home"></i> العودة للرئيسية
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

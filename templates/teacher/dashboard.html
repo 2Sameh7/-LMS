@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-2">
+        <i class="fas fa-tachometer-alt gradient-text"></i>
+        لوحة التحكم
+    </h2>
+    <p class="text-muted">مرحباً بك {{ user.username }}، إليك ملخص نشاطك</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-value">{{ courses_count }}</div>
+            <div class="stat-label">عدد الكورسات</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-label">إجمالي الطلاب</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="stat-value">{{ total_quizzes }}</div>
+            <div class="stat-label">عدد الاختبارات</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="stat-card danger">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">{{ pending_requests }}</div>
+            <div class="stat-label">طلبات قيد المراجعة</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Courses -->
+<div class="card mb-4">
+    <div class="card-header">
+        <span><i class="fas fa-book-open"></i> آخر الكورسات</span>
+        <a href="{% url 'teacher_courses' %}" class="btn btn-sm btn-primary">
+            عرض الكل <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>الكورس</th>
+                        <th>التصنيف</th>
+                        <th>الطلاب</th>
+                        <th>التقييم</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses|slice:":5" %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded bg-primary text-white d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    {{ course.title|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ course.title }}</div>
+                                    <small class="text-muted">${{ course.price }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ course.category|default:"-" }}</td>
+                        <td>{{ course.students_count|default:0 }}</td>
+                        <td>
+                            <span class="text-warning">
+                                <i class="fas fa-star"></i>
+                                {{ course.avg_rating|default:"0"|floatformat:1 }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if course.status == 'published' %}
+                                <span class="badge bg-success">منشور</span>
+                            {% elif course.status == 'draft' %}
+                                <span class="badge bg-secondary">مسودة</span>
+                            {% else %}
+                                <span class="badge bg-danger">مؤرشف</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'manage_content' course.id %}" 
+                                   class="btn btn-outline-primary" 
+                                   data-bs-toggle="tooltip" 
+                                   title="المحتوى">
+                                    <i class="fas fa-file"></i>
+                                </a>
+                                <a href="{% url 'edit_course' course.id %}" 
+                                   class="btn btn-outline-secondary"
+                                   data-bs-toggle="tooltip"
+                                   title="تعديل">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                            <br>لا توجد كورسات بعد
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-bolt"></i>
+                إجراءات سريعة
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'teacher_courses' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-plus"></i> إضافة كورس جديد
+                    </a>
+                    <a href="{% url 'teacher_students' %}" class="btn btn-outline-success">
+                        <i class="fas fa-users"></i> إدارة الطلاب
+                    </a>
+                    <a href="{% url 'teacher_certificates' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-certificate"></i> طلبات الشهادات
+                    </a>
+                    <a href="{% url 'teacher_performance' %}" class="btn btn-outline-info">
+                        <i class="fas fa-chart-line"></i> عرض الأداء
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-bell"></i>
+                آخر الإشعارات
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" 
+                             style="width: 40px; height: 40px;">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">طلب تسجيل جديد</div>
+                            <small class="text-muted">منذ 5 دقائق</small>
+                        </div>
+                        <span class="badge bg-danger">جديد</span>
+                    </div>
+                    <div class="list-group-item d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center" 
+                             style="width: 40px; height: 40px;">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">تقييم جديد على كورس</div>
+                            <small class="text-muted">منذ ساعة</small>
+                        </div>
+                    </div>
+                    <div class="list-group-item d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center" 
+                             style="width: 40px; height: 40px;">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">طلب شهادة جديد</div>
+                            <small class="text-muted">منذ ساعتين</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

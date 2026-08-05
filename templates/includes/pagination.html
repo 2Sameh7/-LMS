@@ -1,0 +1,41 @@
+{% if page_obj.has_other_pages %}
+<nav class="mt-4 d-flex justify-content-center">
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?{% if search %}search={{ search }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_teacher %}teacher={{ selected_teacher }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_course %}course={{ selected_course }}&{% endif %}{% if free_only %}free=1&{% endif %}{% if price_min %}price_min={{ price_min }}&{% endif %}{% if price_max %}price_max={{ price_max }}&{% endif %}page={{ page_obj.previous_page_number }}">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+                <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if search %}search={{ search }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_teacher %}teacher={{ selected_teacher }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_course %}course={{ selected_course }}&{% endif %}{% if free_only %}free=1&{% endif %}{% if price_min %}price_min={{ price_min }}&{% endif %}{% if price_max %}price_max={{ price_max }}&{% endif %}page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?{% if search %}search={{ search }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_teacher %}teacher={{ selected_teacher }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}&{% endif %}{% if selected_status %}status={{ selected_status }}&{% endif %}{% if selected_course %}course={{ selected_course }}&{% endif %}{% if free_only %}free=1&{% endif %}{% if price_min %}price_min={{ price_min }}&{% endif %}{% if price_max %}price_max={{ price_max }}&{% endif %}page={{ page_obj.next_page_number }}">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

@@ -1,0 +1,88 @@
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="footer-title">
+                    <i class="fas fa-graduation-cap"></i>
+                    {{ site_settings.platform_name }}
+                </div>
+                <p class="text-white-50 mb-4">
+                    منصة تعليمية متكاملة تهدف إلى توفير أفضل تجربة تعليمية إلكترونية 
+                    للطلاب في جميع أنحاء الوطن العربي.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-4">
+                <div class="footer-title">روابط سريعة</div>
+                <ul class="footer-links">
+                    <li><a href="{% url 'landing_page' %}"><i class="fas fa-angle-left"></i> الرئيسية</a></li>
+                    <li><a href="{% url 'course_list' %}"><i class="fas fa-angle-left"></i> الكورسات</a></li>
+                    <li><a href="{% url 'register' %}"><i class="fas fa-angle-left"></i> تسجيل جديد</a></li>
+                    <li><a href="{% url 'login' %}"><i class="fas fa-angle-left"></i> تسجيل الدخول</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-4">
+                <div class="footer-title">التصنيفات</div>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-angle-left"></i> برمجة</a></li>
+                    <li><a href="#"><i class="fas fa-angle-left"></i> تصميم</a></li>
+                    <li><a href="#"><i class="fas fa-angle-left"></i> تسويق</a></li>
+                    <li><a href="#"><i class="fas fa-angle-left"></i> إدارة أعمال</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-4 col-md-4">
+                <div class="footer-title">تواصل معنا</div>
+                <ul class="footer-links">
+                    <li>
+                        <a href="mailto:support@lms.sy">
+                            <i class="fas fa-envelope"></i>
+                            support@lms.sy
+                        </a>
+                    </li>
+                    <li>
+                        <a href="tel:+963111234567">
+                            <i class="fas fa-phone"></i>
+                            +963 11 123 4567
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-map-marker-alt"></i>
+                            دمشق، سوريا
+                        </a>
+                    </li>
+                </ul>
+                <div class="mt-4">
+                    <div class="footer-title">طرق الدفع</div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <i class="fab fa-cc-visa fa-2x text-white-50"></i>
+                        <i class="fab fa-cc-mastercard fa-2x text-white-50"></i>
+                        <i class="fab fa-cc-paypal fa-2x text-white-50"></i>
+                        <i class="fab fa-cc-apple-pay fa-2x text-white-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-md-end mb-3 mb-md-0">
+                    &copy; 2024 LMS Platform. جميع الحقوق محفوظة.
+                </div>
+                <div class="col-md-6 text-md-start">
+                    <a href="#" class="text-white-50 ms-3">سياسة الخصوصية</a>
+                    <a href="#" class="text-white-50">شروط الاستخدام</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

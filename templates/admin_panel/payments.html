@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <h2 class="fw-bold mb-2"><i class="fas fa-credit-card" style="color:var(--primary-500);"></i> إدارة طرق الدفع</h2>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="POST" class="row g-3 align-items-end">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div class="col-md-6">
+                <label class="form-label fw-600" style="font-size:0.85rem;">اسم طريقة الدفع</label>
+                <input type="text" name="name" required class="form-control" placeholder="اسم طريقة الدفع">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-success w-100"><i class="fas fa-plus ml-1"></i> إضافة</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-600" style="font-size:0.85rem;">بحث</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="اسم طريقة الدفع..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-600" style="font-size:0.85rem;">الحالة</label>
+                <select class="form-select" name="status" onchange="this.form.submit()">
+                    <option value="">الكل</option>
+                    <option value="active" {% if selected_status == 'active' %}selected{% endif %}>نشط</option>
+                    <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>غير نشط</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-primary flex-fill"><i class="fas fa-search"></i></button>
+                <a href="{% url 'admin_payments' %}" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead style="background:var(--gray-50);">
+                <tr>
+                    <th style="padding:14px;font-weight:600;">اسم الطريقة</th>
+                    <th style="padding:14px;font-weight:600;text-align:center;">الحالة</th>
+                    <th style="padding:14px;font-weight:600;text-align:center;">إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for method in methods %}
+                <tr>
+                    <td style="padding:14px;font-weight:500;">{{ method.name }}</td>
+                    <td style="padding:14px;text-align:center;">
+                        {% if method.is_active %}
+                            <span class="badge bg-success">نشط</span>
+                        {% else %}
+                            <span class="badge bg-danger">غير نشط</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding:14px;text-align:center;">
+                        <div class="d-inline-flex gap-1">
+                            <form method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="toggle">
+                                <input type="hidden" name="method_id" value="{{ method.id }}">
+                                {% if method.is_active %}
+                                    <button type="submit" class="btn btn-sm btn-warning"><i class="fas fa-pause"></i> تعطيل</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-play"></i> تفعيل</button>
+                                {% endif %}
+                            </form>
+                            <form method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="method_id" value="{{ method.id }}">
+                                <button type="submit" onclick="return confirm('هل أنت متأكد من الحذف؟')" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-muted py-4">لا توجد طرق دفع</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
